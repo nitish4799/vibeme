@@ -97,18 +97,6 @@ class _AuthScreen extends State<AuthScreen> {
                             userPhone = value;
                           }),
                         ),
-                        // TextFormField(
-                        //   decoration: InputDecoration(labelText: 'Password'),
-                        //   // keyboardType: TextInputType.,
-                        //   autocorrect: false,
-                        // ),
-                        // TextFormField(
-                        //   decoration: InputDecoration(
-                        //     labelText: 'Confirm Password',
-                        //   ),
-                        //   // keyboardType: TextInputType.number,
-                        //   autocorrect: false,
-                        // ),
                         SizedBox(height: 12),
                         ElevatedButton(
                           onPressed: submitAuth,
