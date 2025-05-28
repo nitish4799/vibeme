@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "730236073734",
+    "project_id": "vibeme-f99c0",
+    "storage_bucket": "vibeme-f99c0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:730236073734:android:584382180d2c3ed9281087",
+        "android_client_info": {
+          "package_name": "com.nitish.vibeme"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGUzye-g8Se_RZUlIlNGbjjow1fLLfCDE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
