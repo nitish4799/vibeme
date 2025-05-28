@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:vibeme/screens/chats.dart';
 import 'package:vibeme/screens/profile.dart';
 
 class Tabs extends StatefulWidget {
@@ -13,7 +14,7 @@ class _TabsState extends State<Tabs> {
   int _selectedIndex = 0;
 
   static const List<Widget> _pages = [
-    Center(child: Text('Chats Page')),
+    Center(child: Chats()),
     Center(child: Text('Contacts Page')),
     Center(child: Text('Calls Page')),
     Center(child: Profile()),
