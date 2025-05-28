@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'otp_dialog.dart';
+import '../widgets/otp_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -14,33 +15,50 @@ class _AuthScreen extends State<AuthScreen> {
   final _formKey = GlobalKey<FormState>();
   dynamic userPhone;
 
-void submitAuth() async {
-  if (_formKey.currentState!.validate()) {
-    _formKey.currentState!.save();
+  Future<void> _postSignInSetup() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
 
-    await FirebaseAuth.instance.verifyPhoneNumber(
-      phoneNumber: '+91$userPhone', 
-      verificationCompleted: (PhoneAuthCredential credential) async {
-        await FirebaseAuth.instance.signInWithCredential(credential);
-      },
-      // 02266657334
-      verificationFailed: (FirebaseAuthException e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Verification failed: ${e.message}')),
-        );
-      },
-      codeSent: (String verificationId, int? resendToken) {
-        showDialog(
-          context: context,
-          builder: (context) => OTPDialog(
-            verificationId: verificationId,
-          ),
-        );
-      },
-      codeAutoRetrievalTimeout: (String verificationId) {},
-    );
+    final userDocRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid);
+
+    final doc = await userDocRef.get();
+
+    if (!doc.exists) {
+      await userDocRef.set({
+        'phone': user.phoneNumber,
+        'createdAt': FieldValue.serverTimestamp(),
+        'profileImageUrl': null, // or set to a default image URL
+      });
+    }
   }
-}
+
+  void submitAuth() async {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+
+      await FirebaseAuth.instance.verifyPhoneNumber(
+        phoneNumber: '+91$userPhone',
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          await FirebaseAuth.instance.signInWithCredential(credential);
+          await _postSignInSetup(); // handle post-sign-in setup
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Verification failed: ${e.message}')),
+          );
+        },
+        codeSent: (String verificationId, int? resendToken) {
+          showDialog(
+            context: context,
+            builder: (context) => OTPDialog(verificationId: verificationId),
+          );
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {},
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

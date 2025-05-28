@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:vibeme/screens/tabs.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class OTPDialog extends StatefulWidget {
   final String verificationId;
@@ -13,6 +14,25 @@ class OTPDialog extends StatefulWidget {
 class _OTPDialogState extends State<OTPDialog> {
   final TextEditingController _otpController = TextEditingController();
 
+  Future<void> _postSignInSetup() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final userDocRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid);
+
+    final doc = await userDocRef.get();
+
+    if (!doc.exists) {
+      await userDocRef.set({
+        'phone': user.phoneNumber,
+        'createdAt': FieldValue.serverTimestamp(),
+        'profileImageUrl': null, // or set to a default image URL
+      });
+    }
+  }
+
   void verifyCode() async {
     final credential = PhoneAuthProvider.credential(
       verificationId: widget.verificationId,
@@ -21,18 +41,15 @@ class _OTPDialogState extends State<OTPDialog> {
 
     try {
       await FirebaseAuth.instance.signInWithCredential(credential);
+      await _postSignInSetup();
 
-      if (!mounted) return; // ✅ Check if widget is still mounted
-
+      if (!mounted) return;
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (_) => Tabs(),
-        ), // Replace with your actual widget
+        MaterialPageRoute(builder: (_) => Tabs()),
         (route) => false,
       );
     } catch (e) {
-      if (!mounted) return; // ✅ Prevent usage of context if unmounted
-
+      if (!mounted) return;
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Failed to sign in: $e')));

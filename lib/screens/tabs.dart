@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:vibeme/screens/profile.dart';
 
 class Tabs extends StatefulWidget {
   const Tabs({super.key});
@@ -14,7 +16,7 @@ class _TabsState extends State<Tabs> {
     Center(child: Text('Chats Page')),
     Center(child: Text('Contacts Page')),
     Center(child: Text('Calls Page')),
-    Center(child: Text('Profile Page')),
+    Center(child: Profile()),
   ];
 
   void _onTabTapped(int index) {
@@ -35,6 +37,47 @@ class _TabsState extends State<Tabs> {
             const Text('Vibe Me'),
           ],
         ),
+        actions: [
+          Builder(
+            builder:
+                (context) => PopupMenuButton<String>(
+                  onSelected: (value) {
+                    if (value == 'settings') {
+                    } else if (value == 'logout') {
+                      FirebaseAuth.instance.signOut();
+                    }
+                  },
+                  offset: Offset(
+                    0,
+                    kToolbarHeight,
+                  ), // 👈 Push it down below the AppBar
+                  itemBuilder:
+                      (BuildContext context) => [
+                        PopupMenuItem(
+                          value: 'settings',
+                          child: Row(
+                            children: [
+                              Icon(Icons.settings, size: 20),
+                              SizedBox(width: 8),
+                              Text('Settings'),
+                            ],
+                          ),
+                        ),
+                        PopupMenuItem(
+                          value: 'logout',
+                          child: Row(
+                            children: [
+                              Icon(Icons.logout, size: 20),
+                              SizedBox(width: 8),
+                              Text('Logout'),
+                            ],
+                          ),
+                        ),
+                      ],
+                  icon: Icon(Icons.more_vert),
+                ),
+          ),
+        ],
       ),
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
